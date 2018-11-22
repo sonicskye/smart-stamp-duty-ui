@@ -1,7 +1,7 @@
 # Smart Stamp Duty User Interface
 Smart Stamp Duty User Interface is the interface for [Smart Stamp Duty's Ethereum-based smart contract](https://github.com/sonicskye/smart-stamp-duty).
 
-##Requirements
+## Requirements
 
 * Python3.5.3+
 * [Web3.py](https://pypi.org/project/web3/)
