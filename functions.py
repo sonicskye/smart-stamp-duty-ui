@@ -1,5 +1,5 @@
 '''
-Dimaz Wijaya
+sonicskye
 functions.py
 Contains reusable functions for the program
 '''
@@ -9,6 +9,7 @@ from eth_account.messages import defunct_hash_message
 from vars import provider, contractAbi, contractAddress
 import time
 import datetime
+import utilities as u
 
 
 # @dev functions related to time
@@ -127,15 +128,21 @@ def createstamp(stampcode, stampname, stampprice, regulationreference, isactive,
 # @param bytes32 StampCode;
 # @param string BloomFilter;
 def createpayment(payCode, docHash, stampCode, bloomFilter, address, privateKey):
-    # gas cost based on trial on Remix is 233612
-    # gas cost based on trial on Ganache is 235327
-    gas = 400000
+    # gas cost based on trial on Remix is 412152
+    # gas cost based on trial on Ganache is 456456
+    gas = 500000
     myContract = web3.eth.contract(address=contractAddress, abi=contractAbi)
     detailTx = {'chainId': 1, 'gas': gas, 'gasPrice': gasprice(), 'nonce': nonce(address), }
-    unsignedTx = myContract.functions.createPayment(payCode, docHash, stampCode, bloomFilter).buildTransaction(detailTx)
+    ts, st = gettimestamp()
+    tsInt = int(ts)
+    stString = str(st)
+    payerSignature = str(sign(docHash, privateKey))
+    #print (payerSignature)
+    unsignedTx = myContract.functions.createPayment(payCode, docHash, stampCode, bloomFilter, tsInt, stString, payerSignature).buildTransaction(detailTx)
     signedTx = web3.eth.account.signTransaction(unsignedTx, private_key=privateKey)
     # send the transaction
-    #web3.eth.sendRawTransaction(signedTx.rawTransaction)
+    # web3.eth.sendRawTransaction(signedTx.rawTransaction)
+    # remove the error message
     try:
         web3.eth.sendRawTransaction(signedTx.rawTransaction)
         return web3.toHex(web3.sha3(signedTx.rawTransaction))
@@ -173,7 +180,7 @@ def verifysignfromhash(messageHash, signature, senderAddress):
 
 # @dev eventstampdutypayment check the event eStampDutyPayment
 # @dev based on payCode
-# @dev THIS WILL CRASH GANACHE
+# @dev DO NOT USE. THIS WILL CRASH GANACHE
 def eventstampdutypayment(payer):
     myContract = web3.eth.contract(address=contractAddress, abi=contractAbi)
     #myFilter = myContract.events.eStampDutyPayment.createFilter(fromBlock='latest', argument_filters={'payer':payer})
@@ -188,8 +195,3 @@ def eventstampdutypayment(payer):
     #myFilter = myContract.eventFilter('eStampDutyPayment', {'fromBlock':0, 'toBlock':'latest'})
     #eventList = myFilter.get_all_entries()
     #return eventList
-
-
-
-
-
