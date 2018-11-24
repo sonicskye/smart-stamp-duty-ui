@@ -1,37 +1,43 @@
 '''
 sonicskye
-functions.py
+w3functions.py
 Contains reusable functions for the program
 '''
 
 from web3 import Web3
 from eth_account.messages import defunct_hash_message
 from vars import provider, contractAbi, contractAddress
-import time
-import datetime
 import utilities as u
 
-
-# @dev functions related to time
-# @dev two values are returned, ts in integer and st in string
-# @dev ts is seconds after epoch (1 January 1970)
-def gettimestamp():
-    ts = time.time()
-    st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-    return ts, st
 
 
 # @dev instantiation of Web3 class
 web3 = Web3(Web3.HTTPProvider(provider, request_kwargs={'timeout': 60}))
 
 
+# @dev createnewkey will create an Ethereum keypair. It returns address and private key respectively
+# @param password is the password to generate the keypair
+# @param address is the first output
+# @param privateKey is the second output
+"""
+# keypair generation
+addr,privkey = createnewkeylocal('abc')
+print(addr,privkey)
+"""
+def createnewkeylocal(password):
+    acct = w3.eth.account.create(password)
+    return acct.address, acct.privateKey.hex()
+
+
 # @dev gasprice computes the gas price
 # @dev manually determined
+# @dev for testing, set gasprice to 0
 # @Todo create gas strategy https://web3py.readthedocs.io/en/stable/gas_price.html
 def gasprice():
-    return web3.toWei(1, 'gwei')
+    return web3.toWei(0, 'gwei')
 
 
+# @dev nonce computes the nonce or the number of transactions created by the address
 def nonce(address):
     return web3.eth.getTransactionCount(address)
 
@@ -130,10 +136,11 @@ def createstamp(stampcode, stampname, stampprice, regulationreference, isactive,
 def createpayment(payCode, docHash, stampCode, bloomFilter, address, privateKey):
     # gas cost based on trial on Remix is 412152
     # gas cost based on trial on Ganache is 456456
-    gas = 500000
+    # after adding bloom filter, the gas should increase significantly. for 100 char of BF, the gas is 543997
+    gas = 5000000
     myContract = web3.eth.contract(address=contractAddress, abi=contractAbi)
     detailTx = {'chainId': 1, 'gas': gas, 'gasPrice': gasprice(), 'nonce': nonce(address), }
-    ts, st = gettimestamp()
+    ts, st = u.gettimestamp()
     tsInt = int(ts)
     stString = str(st)
     payerSignature = str(sign(docHash, privateKey))

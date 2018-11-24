@@ -1,5 +1,12 @@
-import functions as f
+'''
+sonicskye
+ftest.py
+Contains commands to test the functions on functions.py
+'''
+
+import w3functions as f
 import utilities as u
+import bloomfilter as b
 
 web3 = f.web3
 ###################################### testing #######################################
@@ -17,10 +24,11 @@ print (f.createstamp(web3.toBytes(2), "Rp6000", 6000, "UU Bea Meterai 1985", Tru
 print (f.createstamp(web3.toBytes(3), "Rp500", 500, "UU Bea Meterai 1985 tapi sudah tidak laku", False, addr, privKey))
 print (f.createstamp(web3.toBytes(4), "Rp1000", 1000, "UU Bea Meterai 1985 tapi sudah tidak laku", False, addr, privKey))
 
-print (f.createpayment(web3.toBytes(5), u.getsha1string("abc"), web3.toBytes(1), "bloom filter", addr, privKey))
-print (f.createpayment(web3.toBytes(6), u.getsha1string("def"), web3.toBytes(2), "bloom filter2", addr, privKey))
-print (f.createpayment(web3.toBytes(7), u.getsha1string("ghi"), web3.toBytes(1), "bloom filter3", addr, privKey))
-print (f.createpayment(web3.toBytes(8), u.getsha1string("jkl"), web3.toBytes(2), "bloom filter4", addr, privKey))
+print (f.createpayment(web3.toBytes(5), u.getsha1string("abc"), web3.toBytes(1), b.createstringbloomfilter(u.getwords("bloom filter one")), addr, privKey))
+print (f.createpayment(web3.toBytes(6), u.getsha1string("def"), web3.toBytes(2), b.createstringbloomfilter(u.getwords("bloom filter one two")), addr, privKey))
+print (f.createpayment(web3.toBytes(7), u.getsha1string("ghi"), web3.toBytes(1), b.createstringbloomfilter(u.getwords("bloom filter one two three")), addr, privKey))
+print (f.createpayment(web3.toBytes(8), u.getsha1string("jkl"), web3.toBytes(2), b.createstringbloomfilter(u.getwords("bloom filter one two three four")), addr, privKey))
+print (f.createpayment(web3.toBytes(9), u.getsha1string("mno"), web3.toBytes(2), b.createstringbloomfilter(u.getwords("bloom filter one two three four five")), addr, privKey))
 
 #print (getstampcount())
 #print (getstamplist())

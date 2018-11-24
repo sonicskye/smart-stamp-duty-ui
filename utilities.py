@@ -1,7 +1,8 @@
 import hashlib
 import requests
-
-from web3.auto import w3
+import time
+import datetime
+import re
 
 
 #@param BUFF_SIZE is buffer size to read arbitrary file
@@ -57,18 +58,20 @@ def getsha1file(filepath):
     return h.hexdigest()
 
 
-# @dev createnewkey will create an Ethereum keypair. It returns address and private key respectively
-# @param password is the password to generate the keypair
-# @param address is the first output
-# @param privateKey is the second output
-"""
-# keypair generation
-addr,privkey = createnewkeylocal('abc')
-print(addr,privkey)
-"""
-def createnewkeylocal(password):
-    acct = w3.eth.account.create(password)
-    return acct.address, acct.privateKey.hex()
+# @dev functions related to time
+# @dev two values are returned, ts in integer and st in string
+# @dev ts is seconds after epoch (1 January 1970)
+def gettimestamp():
+    ts = time.time()
+    st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+    return ts, st
+
+
+# @dev getwords lists all the words (numbers included) from text
+# @dev result is list
+# @dev https://stackoverflow.com/questions/7633274/extracting-words-from-a-string-removing-punctuation-and-returning-a-list-with-s
+def getwords(text):
+    return re.compile('\w+').findall(text)
 
 
 ##################################### test ################################
