@@ -1,36 +1,43 @@
 '''
-Dimaz Wijaya
-functions.py
+sonicskye
+w3functions.py
 Contains reusable functions for the program
 '''
 
 from web3 import Web3
 from eth_account.messages import defunct_hash_message
 from vars import provider, contractAbi, contractAddress
-import time
-import datetime
+import utilities as u
 
-
-# @dev functions related to time
-# @dev two values are returned, ts in integer and st in string
-# @dev ts is seconds after epoch (1 January 1970)
-def gettimestamp():
-    ts = time.time()
-    st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-    return ts, st
 
 
 # @dev instantiation of Web3 class
 web3 = Web3(Web3.HTTPProvider(provider, request_kwargs={'timeout': 60}))
 
 
+# @dev createnewkey will create an Ethereum keypair. It returns address and private key respectively
+# @param password is the password to generate the keypair
+# @param address is the first output
+# @param privateKey is the second output
+"""
+# keypair generation
+addr,privkey = createnewkeylocal('abc')
+print(addr,privkey)
+"""
+def createnewkeylocal(password):
+    acct = w3.eth.account.create(password)
+    return acct.address, acct.privateKey.hex()
+
+
 # @dev gasprice computes the gas price
 # @dev manually determined
+# @dev for testing, set gasprice to 0
 # @Todo create gas strategy https://web3py.readthedocs.io/en/stable/gas_price.html
 def gasprice():
-    return web3.toWei(1, 'gwei')
+    return web3.toWei(0, 'gwei')
 
 
+# @dev nonce computes the nonce or the number of transactions created by the address
 def nonce(address):
     return web3.eth.getTransactionCount(address)
 
@@ -127,15 +134,22 @@ def createstamp(stampcode, stampname, stampprice, regulationreference, isactive,
 # @param bytes32 StampCode;
 # @param string BloomFilter;
 def createpayment(payCode, docHash, stampCode, bloomFilter, address, privateKey):
-    # gas cost based on trial on Remix is 233612
-    # gas cost based on trial on Ganache is 235327
-    gas = 400000
+    # gas cost based on trial on Remix is 412152
+    # gas cost based on trial on Ganache is 456456
+    # after adding bloom filter, the gas should increase significantly. for 100 char of BF, the gas is 543997
+    gas = 5000000
     myContract = web3.eth.contract(address=contractAddress, abi=contractAbi)
     detailTx = {'chainId': 1, 'gas': gas, 'gasPrice': gasprice(), 'nonce': nonce(address), }
-    unsignedTx = myContract.functions.createPayment(payCode, docHash, stampCode, bloomFilter).buildTransaction(detailTx)
+    ts, st = u.gettimestamp()
+    tsInt = int(ts)
+    stString = str(st)
+    payerSignature = str(sign(docHash, privateKey))
+    #print (payerSignature)
+    unsignedTx = myContract.functions.createPayment(payCode, docHash, stampCode, bloomFilter, tsInt, stString, payerSignature).buildTransaction(detailTx)
     signedTx = web3.eth.account.signTransaction(unsignedTx, private_key=privateKey)
     # send the transaction
-    #web3.eth.sendRawTransaction(signedTx.rawTransaction)
+    # web3.eth.sendRawTransaction(signedTx.rawTransaction)
+    # remove the error message
     try:
         web3.eth.sendRawTransaction(signedTx.rawTransaction)
         return web3.toHex(web3.sha3(signedTx.rawTransaction))
@@ -173,7 +187,7 @@ def verifysignfromhash(messageHash, signature, senderAddress):
 
 # @dev eventstampdutypayment check the event eStampDutyPayment
 # @dev based on payCode
-# @dev THIS WILL CRASH GANACHE
+# @dev DO NOT USE. THIS WILL CRASH GANACHE
 def eventstampdutypayment(payer):
     myContract = web3.eth.contract(address=contractAddress, abi=contractAbi)
     #myFilter = myContract.events.eStampDutyPayment.createFilter(fromBlock='latest', argument_filters={'payer':payer})
@@ -188,8 +202,3 @@ def eventstampdutypayment(payer):
     #myFilter = myContract.eventFilter('eStampDutyPayment', {'fromBlock':0, 'toBlock':'latest'})
     #eventList = myFilter.get_all_entries()
     #return eventList
-
-
-
-
-
