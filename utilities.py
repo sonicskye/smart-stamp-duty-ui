@@ -31,9 +31,9 @@ def singlequotedstr(s):
 # @output sha1 value of x
 """
 #compute SHA1 from a string
-print (getsha1string('ABCD'))
+print (sha1string('ABCD'))
 """
-def getsha1string(x):
+def sha1string(x):
     h = hashlib.sha1()
     h.update(x.encode('utf-8'))
     return h.hexdigest()
@@ -45,9 +45,9 @@ def getsha1string(x):
 """
 #compute SHA1 from a file, the README.md
 filepath = 'README.md'
-print (getsha1file(filepath))
+print (sha1file(filepath))
 """
-def getsha1file(filepath):
+def sha1file(filepath):
     h = hashlib.sha1()
     with open(filepath,'rb') as f:
         while True:
@@ -73,8 +73,6 @@ def gettimestamp():
 def getwords(text):
     return re.compile('\w+').findall(text)
 
-
-##################################### test ################################
 
 
 
