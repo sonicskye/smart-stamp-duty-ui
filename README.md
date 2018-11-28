@@ -7,16 +7,17 @@ Smart Stamp Duty User Interface is the interface for [Smart Stamp Duty's Ethereu
 * [Web3.py](https://pypi.org/project/web3/)
 * hashlib
 
-For the Bloom Filter part (which is optional), the requirements are:
+For the Bloom Filter part, the requirements are:
 * [Cython](http://cython.org) or [bitarray](https://github.com/ilanschnell/bitarray)
 * [pybloof](https://github.com/jhgg/pybloof)
 
-If you want to compile your solidity contract inside python, then these are required
-
-* [solc](https://solidity.readthedocs.io/en/develop/installing-solidity)
-* [py-solc](https://github.com/ethereum/py-solc)
-* [eth-testrpc](https://github.com/pipermerriam/eth-testrpc)
-
-use pip3 install eth-testrpc
-
 The code is tested on [Ganache](http://truffleframework.com/ganache/), connected through http
+
+The GUI is built by using Qt4 designer and requires PyQt4 to run.
+* Python3-qt4
+
+## Notes
+This UI is a proof-of-concept of Smart Stamp Duty. The variables related to the smart contract can be found on vars.py.
+The address and the private key information can be found on main.py. The pair is created by Ganache.
+
+To run this UI, run `python main.py`

@@ -31,9 +31,11 @@ def createstringbloomfilter(wordlist):
 
 def teststringbloomfilter(bfValue, wordlist):
     bf = pybloof.StringBloomFilter.from_base64(bfValue.encode('utf-8'))
-    wlength = len(wordlist)
+    setwordlist = set(wordlist)
+    wlength = len(setwordlist)
+    #print (str(wlength))
     positive = 0
-    for word in wordlist:
+    for word in setwordlist:
         if word in bf:
             positive += 1;
     res = round(positive/wlength *100)

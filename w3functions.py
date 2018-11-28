@@ -8,6 +8,7 @@ from web3 import Web3
 from eth_account.messages import defunct_hash_message
 from vars import provider, contractAbi, contractAddress
 import utilities as u
+import binascii
 
 
 
@@ -67,8 +68,19 @@ def getstamplist():
     return callfunc(contractAddress, contractAbi, functionName)
 
 
+# @dev getstampcodes gets stamp codes only and put them in an array
+def getstampcodes():
+    stampCodes = getstamplist()
+    stampCodeList = []
+    stampCodeList.clear()
+    for stampCode in stampCodes:
+        #print (stampCode)
+        stampCodeList.append(binascii.hexlify(stampCode).decode('utf-8'))
+    return stampCodeList
+
+
 # @dev getstampdetail calls "getStampDetail" function in smart contract
-# @dev returns the detail of the stamp based on stampcode
+# @dev returns the detail of the stamp based on stampcode: StampCode, StampName, StampPrice, RegulationReference, StampIndex, IsActive
 # @param stampcode is the primary key or identifier for the stamp
 def getstampdetail(stampcode):
     myContract = web3.eth.contract(address=contractAddress, abi=contractAbi)
@@ -76,6 +88,31 @@ def getstampdetail(stampcode):
     functionToCall = myContract.functions[functionName]
     functionResult = functionToCall(stampcode).call()
     return functionResult
+
+
+def getstampnamefromcode(stampcode):
+    myContract = web3.eth.contract(address=contractAddress, abi=contractAbi)
+    functionName = "getStampDetail"
+    functionToCall = myContract.functions[functionName]
+    functionResult = functionToCall(stampcode).call()
+    return functionResult[1]
+
+
+# @dev getstampactivation checks the isactive status of stampcode
+def getstampactivation(stampcode):
+    stampDetail = getstampdetail(stampcode)
+    return stampDetail[5]
+
+
+# @dev getstampcodes gets stamp codes only and put them in an array
+def getactivestampcodes():
+    stampCodes = getstamplist()
+    stampCodeList = []
+    stampCodeList.clear()
+    for stampCode in stampCodes:
+        if getstampactivation(stampCode):
+            stampCodeList.append(binascii.hexlify(stampCode).decode('utf-8'))
+    return stampCodeList
 
 
 # @dev getpaymentcount calls "getPaymentCount" function in smart contract
@@ -122,9 +159,39 @@ def createstamp(stampcode, stampname, stampprice, regulationreference, isactive,
     #web3.eth.sendRawTransaction(signedTx.rawTransaction)
     try:
         web3.eth.sendRawTransaction(signedTx.rawTransaction)
-        return web3.toHex(web3.sha3(signedTx.rawTransaction))
+        return "Transaction ID: " + web3.toHex(web3.sha3(signedTx.rawTransaction))
     except:
         return "transaction failed"
+
+
+# @dev stampactivate activates the stamp of stampcode
+def stampactivate(stampcode, address, privateKey):
+    # gas cost based on trial on Remix is 22556
+    gas = 50000
+    myContract = web3.eth.contract(address=contractAddress, abi=contractAbi)
+    detailTx = {'chainId': 1, 'gas': gas, 'gasPrice': gasprice(), 'nonce': nonce(address), }
+    unsignedTx = myContract.functions.stampActivate(stampcode).buildTransaction(detailTx)
+    signedTx = web3.eth.account.signTransaction(unsignedTx, private_key=privateKey)
+    try:
+        web3.eth.sendRawTransaction(signedTx.rawTransaction)
+        return "Transaction ID: " + web3.toHex(web3.sha3(signedTx.rawTransaction))
+    except:
+        return "transaction failed"
+
+
+# @dev stampdeactivate deactivates the stamp of stampcode
+def stampdeactivate(stampcode, address, privateKey):
+    # gas cost based on trial on Remix is 7808
+    gas = 50000
+    myContract = web3.eth.contract(address=contractAddress, abi=contractAbi)
+    detailTx = {'chainId': 1, 'gas': gas, 'gasPrice': gasprice(), 'nonce': nonce(address), }
+    unsignedTx = myContract.functions.stampDeactivate(stampcode).buildTransaction(detailTx)
+    signedTx = web3.eth.account.signTransaction(unsignedTx, private_key=privateKey)
+    try:
+        web3.eth.sendRawTransaction(signedTx.rawTransaction)
+        return "Transaction ID: " + web3.toHex(web3.sha3(signedTx.rawTransaction))
+    except:
+        return "Transaction failed"
 
 
 # @dev createpayment executes transaction "createPayment" function in smart contract and sends it to the network
@@ -152,9 +219,9 @@ def createpayment(payCode, docHash, stampCode, bloomFilter, address, privateKey)
     # remove the error message
     try:
         web3.eth.sendRawTransaction(signedTx.rawTransaction)
-        return web3.toHex(web3.sha3(signedTx.rawTransaction))
+        return "Transaction ID: " + web3.toHex(web3.sha3(signedTx.rawTransaction))
     except:
-        return "transaction failed"
+        return "Transaction failed"
 
 
 # @dev sign will produce signature from a local key
