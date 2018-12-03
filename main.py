@@ -19,6 +19,7 @@ privKey = "0b295aa109fcc22c6bc165fa213c952523cf1bef115483992e2afd8ccb47991e"
 addr = "0x06667BE53072905D1146f0Ab303D2a059c684F3a"
 web3 = f.web3
 
+
 class SSDApp(QtGui.QMainWindow, design.Ui_MainWindow):
     def __init__(self, parent=None):
         #super(SSDApp, self).__init__(parent)
@@ -26,7 +27,6 @@ class SSDApp(QtGui.QMainWindow, design.Ui_MainWindow):
         self.setupUi(self)
         # sets layout
         self.setupSignals()
-
 
     # define all functions to be connected to events
     def setupSignals(self):
@@ -55,7 +55,6 @@ class SSDApp(QtGui.QMainWindow, design.Ui_MainWindow):
         self.cbStampCode.clear()
         self.cbStampCode.addItems(lst)
 
-
     # @dev loadstampdata loads the stamp data to the correct entries whenever the combobox cbStampCode is switched
     # @dev handles cbStampCode.currentIndexChanged
     def loadstampdata(self):
@@ -73,7 +72,6 @@ class SSDApp(QtGui.QMainWindow, design.Ui_MainWindow):
             #self.pteStampLog.appendPlainText(str(stampDetail[4]))
             self.chStampIsActive.setChecked(stampDetail[5])
 
-
     # @dev createstamp creates a new stamp
     def createstamp(self):
         # createstamp(stampcode, stampname, stampprice, regulationreference, isactive, address, privateKey)
@@ -86,7 +84,6 @@ class SSDApp(QtGui.QMainWindow, design.Ui_MainWindow):
         logData = f.createstamp(stampCodeRaw, self.leStampName.text(), self.sbStampPrice.value(), self.teRegulationRef.toPlainText(), checked, addr, privKey)
         self.pteStampLog.appendPlainText("Create Stamp: " + logData)
         return True
-
 
     # @dev changeactivation changes the active status - active or inactive
     def changeactivation(self):
@@ -108,7 +105,6 @@ class SSDApp(QtGui.QMainWindow, design.Ui_MainWindow):
                 self.pteStampLog.appendPlainText("Change Activation to " + str(checked) + ": " + logData)
                 return True
 
-
     # @dev getfilepath will get a file path
     def getfilepath(self):
         filepath = QtGui.QFileDialog.getOpenFileName(self)
@@ -121,13 +117,11 @@ class SSDApp(QtGui.QMainWindow, design.Ui_MainWindow):
             # @ToDo should call this from setting
             self.lePayerAddress.setText(addr)
 
-
     # @dev sha1file calls sha1file from utilities.sha1file to compute SHA1 value of a file
     def generatesha1file(self):
         if self.leDocPath.text() != "":
             filepath = self.leDocPath.text()
             self.leDocHash.setText(u.sha1file(filepath))
-
 
     def updatetimestamp(self):
         present_qdatetime = QtCore.QDateTime.currentDateTime()
@@ -135,7 +129,6 @@ class SSDApp(QtGui.QMainWindow, design.Ui_MainWindow):
         #present_qdatetime.setMSecsSinceEpoch(1000 * i_unix_time_it)
         #self.ptePaymentLog.appendPlainText(str(present_qdatetime)))
         self.dteTimestamp.setDateTime(present_qdatetime)
-
 
     # @dev loadstampcodepayment loads stamp code for the payment part
     # @dev only shows active stamp code
@@ -145,8 +138,8 @@ class SSDApp(QtGui.QMainWindow, design.Ui_MainWindow):
         self.cbStampCodePayment.clear()
         self.cbStampCodePayment.addItems(lst)
 
-
-    # @dev loadstampdatapayment loads the stamp data to the correct entries whenever the combobox cbStampCodePayment is switched
+    # @dev loadstampdatapayment loads the stamp data to the correct entries
+    #   whenever the combobox cbStampCodePayment is switched
     # @dev handles cbStampCode.currentIndexChanged
     def loadstampdatapayment(self):
         # get the code in the correct format
@@ -159,20 +152,17 @@ class SSDApp(QtGui.QMainWindow, design.Ui_MainWindow):
             self.sbStampPricePayment.setValue(stampDetail[2])
             # self.pteStampLog.appendPlainText(str(stampDetail[4]))
 
-
     # @dev generatepaycode computes sha1 of several parameters from the UI
     def generatepaycode(self):
         ts, st = u.gettimestamp()
         theText = self.leDocHash.text() + self.lePayerAddress.text() + self.cbStampCodePayment.currentText() + self.dteTimestamp.text()
         self.lePayCode.setText(u.sha1string(theText))
 
-
     # @dev generatebloomfilter generates bloom filter from plaintext supplied
     def generatebloomfilter(self):
         alist = u.getwords(self.teWordList.toPlainText())
         bfValue = bf.createstringbloomfilter(alist)
         self.teBloomFilter.setText(bfValue)
-
 
     # @dev createpayment sends payment
     def createpayment(self):
@@ -183,7 +173,6 @@ class SSDApp(QtGui.QMainWindow, design.Ui_MainWindow):
                                 self.teBloomFilter.toPlainText(), addr, privKey)
         self.ptePaymentLog.appendPlainText("Create Payment: " + logData)
         return True
-
 
     # @dev getpaymenthistory returns payment history
     # @dev shows the result in a table
@@ -218,7 +207,6 @@ class SSDApp(QtGui.QMainWindow, design.Ui_MainWindow):
             table.setItem(i, 4, QtGui.QTableWidgetItem(paymentDetail[5]))
             i += 1
         return
-
 
     # @dev contentmatching is a tool to test a bloom filter against a word list
     # @dev wordlist needs to be converted into a list of words
