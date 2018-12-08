@@ -14,9 +14,14 @@ import binascii
 import utilities as u
 import bloomfilter as bf
 
-# for development
-privKey = "0b295aa109fcc22c6bc165fa213c952523cf1bef115483992e2afd8ccb47991e"
-addr = "0x06667BE53072905D1146f0Ab303D2a059c684F3a"
+# Ganache
+#privKey = "0b295aa109fcc22c6bc165fa213c952523cf1bef115483992e2afd8ccb47991e"
+#addr = "0x06667BE53072905D1146f0Ab303D2a059c684F3a"
+
+# Rinkeby funded
+privKey = "5f294da09a4cf1e3d34bd4827bd42f791e7e0464cd72f64445cee619e5418c47"
+addr = "0xcA4637C7E2a42f787d4b3C9F476B9716ABCD3838"
+
 web3 = f.web3
 
 

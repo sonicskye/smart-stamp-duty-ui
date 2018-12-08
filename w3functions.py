@@ -6,7 +6,7 @@ Contains reusable functions for the program
 
 from web3 import Web3
 from eth_account.messages import defunct_hash_message
-from vars import provider, contractAbi, contractAddress
+from vars import provider, contractAbi, contractAddress, chainID
 import utilities as u
 import binascii
 
@@ -35,7 +35,7 @@ def createnewkeylocal(password):
 # @dev for testing, set gasprice to 0
 # @Todo create gas strategy https://web3py.readthedocs.io/en/stable/gas_price.html
 def gasprice():
-    return web3.toWei(0, 'gwei')
+    return web3.toWei(3, 'gwei')
 
 
 # @dev nonce computes the nonce or the number of transactions created by the address
@@ -150,9 +150,10 @@ def getpaymentdetail(payCode):
 def createstamp(stampcode, stampname, stampprice, regulationreference, isactive, address, privateKey):
     # gas cost based on trial on Remix is 158985
     # gas cost based on trial on Ganache is 174771 and 173969
-    gas = 300000
+    # for Rinkeby, give more gas
+    gas = 3000000
     myContract = web3.eth.contract(address=contractAddress, abi=contractAbi)
-    detailTx = {'chainId': 1, 'gas': gas, 'gasPrice': gasprice(), 'nonce': nonce(address), }
+    detailTx = {'chainId': chainID, 'gas': gas, 'gasPrice': gasprice(), 'nonce': nonce(address), }
     unsignedTx = myContract.functions.createStamp(stampcode, stampname, stampprice, regulationreference, isactive).buildTransaction(detailTx)
     signedTx = web3.eth.account.signTransaction(unsignedTx, private_key=privateKey)
     # send the transaction
@@ -169,7 +170,7 @@ def stampactivate(stampcode, address, privateKey):
     # gas cost based on trial on Remix is 22556
     gas = 50000
     myContract = web3.eth.contract(address=contractAddress, abi=contractAbi)
-    detailTx = {'chainId': 1, 'gas': gas, 'gasPrice': gasprice(), 'nonce': nonce(address), }
+    detailTx = {'chainId': chainID, 'gas': gas, 'gasPrice': gasprice(), 'nonce': nonce(address), }
     unsignedTx = myContract.functions.stampActivate(stampcode).buildTransaction(detailTx)
     signedTx = web3.eth.account.signTransaction(unsignedTx, private_key=privateKey)
     try:
@@ -184,7 +185,7 @@ def stampdeactivate(stampcode, address, privateKey):
     # gas cost based on trial on Remix is 7808
     gas = 50000
     myContract = web3.eth.contract(address=contractAddress, abi=contractAbi)
-    detailTx = {'chainId': 1, 'gas': gas, 'gasPrice': gasprice(), 'nonce': nonce(address), }
+    detailTx = {'chainId': chainID, 'gas': gas, 'gasPrice': gasprice(), 'nonce': nonce(address), }
     unsignedTx = myContract.functions.stampDeactivate(stampcode).buildTransaction(detailTx)
     signedTx = web3.eth.account.signTransaction(unsignedTx, private_key=privateKey)
     try:
@@ -206,7 +207,7 @@ def createpayment(payCode, docHash, stampCode, bloomFilter, address, privateKey)
     # after adding bloom filter, the gas should increase significantly. for 100 char of BF, the gas is 543997
     gas = 5000000
     myContract = web3.eth.contract(address=contractAddress, abi=contractAbi)
-    detailTx = {'chainId': 1, 'gas': gas, 'gasPrice': gasprice(), 'nonce': nonce(address), }
+    detailTx = {'chainId': chainID, 'gas': gas, 'gasPrice': gasprice(), 'nonce': nonce(address), }
     ts, st = u.gettimestamp()
     tsInt = int(ts)
     stString = str(st)
